@@ -53,6 +53,9 @@ void SurfaceMeshProcessing::createActions()
 	clearAction->setStatusTip(tr("Clear the Current Mesh"));
 	connect(clearAction, SIGNAL(triggered()), viewer, SLOT(clear_all_mesh()));
 
+	// 对于那些可以被选中或切换状态的动作（例如，切换视图模式、启用或禁用某个选项等）
+	// setChecked方法可以改变QAction的选中状态，向用户提供直观的视觉反馈。
+	// 选中的动作通常在菜单或工具栏中以勾选标记显示。
 	wireFrameAction = new QAction(tr("&WireFrame"), this);
 	wireFrameAction->setIcon(QIcon(":/SurfaceMeshProcessing/Images/wire.png"));
 	wireFrameAction->setStatusTip(tr("Using wireFrame showing method"));
@@ -196,6 +199,15 @@ void SurfaceMeshProcessing::createActions()
 	EdgeFlipAction->setChecked(false);
 	connect(EdgeFlipAction, SIGNAL(triggered()), this, SLOT(edge_flip()));
 
+	// 创建网格简化动作
+	MeshSimplifyAction = new QAction(tr("&Mesh Simplify"), this);
+	MeshSimplifyAction->setIcon(QIcon(":/SurfaceMeshProcessing/Images/meshsimply.png"));
+	MeshSimplifyAction->setStatusTip(tr("this action will use QEM to simplify mesh"));
+	MeshSimplifyAction->setCheckable(true);
+	MeshSimplifyAction->setChecked(false);
+	connect(MeshSimplifyAction, SIGNAL(triggered()), this, SLOT(qem_simplify()));
+
+
 	saveScreenAction = new QAction("Save Screen",this);
 	saveScreenAction->setIcon(QIcon(":/SurfaceMeshProcessing/Images/saveScreen.png"));
 	saveScreenAction->setStatusTip(tr("Save Screen"));
@@ -292,6 +304,12 @@ void SurfaceMeshProcessing::createMenus()
 	Auxiliary_Menu->addAction(delete_vertex_valence_four);
 	Auxiliary_Menu->addAction(delete_vertex_valence_three);
 	Auxiliary_Menu->addAction(split_vertex_valence_eight);
+
+	// 增加一个 menu
+	homework_Menu = menuBar()->addMenu("Homework");
+	homework_Menu->addAction(MeshSimplifyAction);
+
+
 	helpMenu = menuBar()->addMenu(tr("&Help"));
 }
 
@@ -330,6 +348,9 @@ void SurfaceMeshProcessing::createToolBars()
 	localOperationBar->addAction(EdgeCollpaseAction);
 	localOperationBar->addAction(EdgeSplitAction);
 	localOperationBar->addAction(EdgeFlipAction);
+
+	homeworkToolBar = addToolBar(tr("HomeWork"));
+	homeworkToolBar->addAction(MeshSimplifyAction);
 }
 
 void SurfaceMeshProcessing::createStatusBar()
@@ -480,6 +501,14 @@ void SurfaceMeshProcessing::edge_split()
 	viewer->setMouseMode(InteractiveViewerWidget::EDGESPLIT);
 }
 
+void SurfaceMeshProcessing::qem_simplify()
+{
+	setAllViewActionChecked(false);
+	setAllMouseActionChecked(false);
+	MeshSimplifyAction->setChecked(true);
+	viewer->setMouseMode(InteractiveViewerWidget::SIMPLIFY);
+}
+
 // 设置鼠标 action 的激活状态
 void SurfaceMeshProcessing::setAllMouseActionChecked(bool b)
 {
@@ -493,6 +522,8 @@ void SurfaceMeshProcessing::setAllMouseActionChecked(bool b)
 	EdgeCollpaseAction->setChecked(b);
 	EdgeSplitAction->setChecked(b);
 	EdgeFlipAction->setChecked(b);
+
+	MeshSimplifyAction->setChecked(b);
 }
 
 void SurfaceMeshProcessing::setMouseMode_slot(int mm)
@@ -663,4 +694,3 @@ void SurfaceMeshProcessing::aux_split_vertex_valence_eight()
 {
 	viewer->aux_split_vertex_valence_eight();
 }
-

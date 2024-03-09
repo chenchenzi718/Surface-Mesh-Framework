@@ -88,8 +88,9 @@ public slots:
 	}
 
 public:
+	// 增加 simplify 项
 	enum { TRANS, POINTPICK, VERTEXPICK, EDGEPICK, FACEPICK, EDGECOLLAPSE, EDGEFLIP, 
-		EDGESPLIT , MOVE, T2_MODE, N_MODE };
+		EDGESPLIT , MOVE, T2_MODE, N_MODE, SIMPLIFY };
 	void setMouseMode(int mm);
 	int mouseMode() const { return mouse_mode_; }
 
@@ -159,6 +160,30 @@ public:
 	void split_vertex_valence_eight();
 #pragma endregion
 
+
+#pragma region HomeWork_region
+public:
+	// 执行 QEM 算法
+	void QEMSimplifyMesh();
+
+	void SetSimplifyLevel(int level)
+	{
+		// 每次 level 变化，计算此时需要减少到多少点，然后进行操作
+		simplify_mesh_vertex =
+			(mesh_vertex_num >> level) >= simplify_lowest_vertex_num ? (mesh_vertex_num >> level) : simplify_lowest_vertex_num;
+	}
+
+protected:
+	// mesh 的 vertex 数目
+	int mesh_vertex_num;
+
+	// 简化等级
+	int simplify_level = 0;
+	// 简化后有多少点
+	int simplify_mesh_vertex;
+
+	int simplify_lowest_vertex_num = 10;
+#pragma endregion
 };
 
 #endif

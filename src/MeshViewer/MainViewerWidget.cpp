@@ -31,6 +31,7 @@ void MainViewerWidget::initViewerWindow()
 	main_layout->addWidget(MeshViewer, 5);
 	this->setLayout(main_layout);
 
+	// 信号从 meshviewer 传递给 mainviewwidget，然后再发送出去传给 surfacemeshprocess 内的 slot
 	connect(MeshViewer,SIGNAL(setMouseMode_signal(int)),SIGNAL(setMouseMode_signal_main(int)));
 	connect(MeshViewer,SIGNAL(setDrawMode_signal(int)),SIGNAL(setDrawMode_signal_main(int)));
 	connect(MeshViewer,SIGNAL(set_edit_undo_enable_viewer_signal(bool)),SIGNAL(set_edit_undo_enable_signal(bool)));

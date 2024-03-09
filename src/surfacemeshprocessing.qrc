@@ -29,5 +29,6 @@
       <file>Images/topology-edgeFlip.png</file>
       <file>Images/edit-redo.png</file>
       <file>Images/edit-undo.png</file>
+      <file>Images/meshsimply.png</file>
     </qresource>
 </RCC>

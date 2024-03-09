@@ -161,6 +161,8 @@ protected:
 private:
 	InteractiveViewerWidget* MeshViewer;
 	MeshParamDialog* MeshParam;
+
+
 	
 	void SetMeshForALL( )
 	{

@@ -69,7 +69,6 @@ file (GLOB MeshViewer_FILE
     src/MeshViewer/MeshViewerWidget.*
     src/MeshViewer/OpenglHeaders.h
     src/MeshViewer/QGLViewerWidget.*
-    src/MeshViewer/MeshSimplification.*
 )
 
 add_executable(${PROJECT_NAME} ${SRCFILES} 

@@ -66,6 +66,7 @@ protected:
 	void updateMeshNormals(); // used by update_mesh().
 
 protected:
+	// draw_scene 为主绘制调用 draw_scene_mesh，draw_scene_mesh 绘制底下五个 private 函数
 	virtual void draw_scene(int drawmode);
 	void draw_scene_mesh(int drawmode);
 	

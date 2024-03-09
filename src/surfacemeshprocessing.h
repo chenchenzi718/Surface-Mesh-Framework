@@ -58,6 +58,9 @@ private slots:
 	void edge_flip();
 	void edge_split();
 
+	// 增加网格简化
+	void qem_simplify();
+
 	void aux_inverse_mesh_connectivity();
 	void aux_scale_mesh_BBox();
 	void aux_split_quad_mesh();
@@ -122,8 +125,11 @@ private:
 	QAction* EdgeCollpaseAction;
 	QAction* EdgeFlipAction;
 	QAction* EdgeSplitAction;
-	// Help Actions.
 
+	// 网格简化动作
+	QAction* MeshSimplifyAction;
+
+	// Help Actions.
 	QAction* saveScreenAction;
 	QAction* saveScreenActionDirectly;
 
@@ -132,6 +138,7 @@ private:
 	QMenu* viewMenu;
 	QMenu* mouseMenu;
 	QMenu* Auxiliary_Menu;
+	QMenu* homework_Menu;
 	QMenu* helpMenu;
 
 	// ToolBars.
@@ -141,6 +148,7 @@ private:
 	QToolBar* mouseToolBar;
 	QToolBar* localOperationBar;
 	QToolBar* saveToolBar;
+	QToolBar* homeworkToolBar;
 
 	//label
 	QLabel* statusLabel;

@@ -13,6 +13,11 @@ InteractiveViewerWidget::InteractiveViewerWidget(QWidget* parent /* = 0 */)
 	draw_new_mesh = false;
 	clearSelectedData();
 	kdTree = NULL;
+
+	simplify_mesh_vertex = mesh_vertex_num = mesh.n_vertices();
+
+	if (simplify_lowest_vertex_num > mesh_vertex_num)
+		simplify_lowest_vertex_num = 3;
 }
 
 InteractiveViewerWidget::InteractiveViewerWidget(QGLFormat& _fmt, QWidget* _parent)
@@ -21,6 +26,11 @@ InteractiveViewerWidget::InteractiveViewerWidget(QGLFormat& _fmt, QWidget* _pare
 	draw_new_mesh = false;
 	clearSelectedData();
 	kdTree = NULL;
+
+	simplify_mesh_vertex = mesh_vertex_num = mesh.n_vertices();
+
+	if (simplify_lowest_vertex_num > mesh_vertex_num)
+		simplify_lowest_vertex_num = 3;
 }
 
 InteractiveViewerWidget::~InteractiveViewerWidget()
@@ -35,6 +45,13 @@ void InteractiveViewerWidget::setMouseMode(int mm)
 		mouse_mode_ = mm;
 		if( TRANS != mouse_mode_ )
 		{ buildIndex(); }
+
+		// 如果 mousemode 变成了 SIMPLIFY，那么就进行一波网格简化操作
+		if(SIMPLIFY == mouse_mode_)
+		{
+			this->QEMSimplifyMesh();
+		}
+
 		emit setMouseMode_signal(mm);
 	}
 }
@@ -245,6 +262,12 @@ void InteractiveViewerWidget::mouseReleaseEvent(QMouseEvent *_event)
 				Mesh::Point P(selectedPoint[0],selectedPoint[1],selectedPoint[2]);
 				mesh.set_point( mesh.vertex_handle(lastestVertex), P );
 				selectedVertex.clear();
+
+				// 修改原框架此处代码
+				mesh_vector.push_back(mesh); mesh_vector_index += 1;
+				emit set_edit_undo_enable_viewer_signal(true);
+				emit set_edit_redo_enable_viewer_signal(false);
+
 				updateGL();
 			}
 		}
@@ -608,4 +631,18 @@ void InteractiveViewerWidget::render_text_slot(OpenMesh::Vec3d pos, QString str)
 	int y = viewport[3]-(long)winY;
 	render_text(x,y,str);*/
 	render_text(pos[0],pos[1],pos[2],str);
+}
+
+
+// 实现 QEM 简化
+void InteractiveViewerWidget::QEMSimplifyMesh()
+{
+	SetSimplifyLevel(2);
+
+	
+
+	mesh_vector.push_back(mesh); mesh_vector_index += 1;
+	emit set_edit_undo_enable_viewer_signal(true);
+	emit set_edit_redo_enable_viewer_signal(false);
+	updateGL();
 }
