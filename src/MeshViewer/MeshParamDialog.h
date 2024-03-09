@@ -5,6 +5,11 @@
 #include <QtGui>
 #include <QtWidgets>
 
+
+/*
+*  创建了整个框架的左侧 tab QP 以及按钮 Print Mesh Information
+*/
+
 class MeshParamDialog : public QDialog
 {
 	Q_OBJECT

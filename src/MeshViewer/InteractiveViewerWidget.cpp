@@ -387,6 +387,7 @@ int InteractiveViewerWidget::find_face_using_selected_point()
 	int rv = find_vertex_using_selected_point();
 	Mesh::VertexFaceIter vf_it = mesh.vf_iter( mesh.vertex_handle(rv) );
 	int desiredFace = -1; //double minLen = 10*radius();
+	// 输入的不是三角网格时出错，Vec3d 超出数组
 	std::vector<OpenMesh::Vec3d> tri_p(3); int tri_count = 0;
 	Mesh::Point resultP(selectedPoint[0],selectedPoint[1],selectedPoint[2]);
 	for( vf_it; vf_it; ++vf_it )
@@ -437,6 +438,7 @@ int InteractiveViewerWidget::find_edge_using_selected_point()
 	return desiredEdge;
 }
 
+// 这段代码的目的是根据一个3D网格的顶点数据构建一个k-d树，以便于高效地执行最近邻查询
 void InteractiveViewerWidget::buildIndex()
 {
 	if(mesh.n_vertices() == 0)

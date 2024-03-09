@@ -405,6 +405,9 @@ void SurfaceMeshProcessing::DrawMeshBoundary()
 	viewer->set_show_mesh_boundary();
 }
 
+
+// 此函数的目的是统一设置一组视图相关的操作的选中状态
+// 具体来说，它接收一个布尔参数 b，并根据这个参数的值（true 或 false）来启用或禁用一系列视图模式选项
 void SurfaceMeshProcessing::setAllViewActionChecked(bool b)
 {
 	wireFrameAction->setChecked(b);
@@ -477,6 +480,7 @@ void SurfaceMeshProcessing::edge_split()
 	viewer->setMouseMode(InteractiveViewerWidget::EDGESPLIT);
 }
 
+// 设置鼠标 action 的激活状态
 void SurfaceMeshProcessing::setAllMouseActionChecked(bool b)
 {
 	PointPickAction->setChecked(b);

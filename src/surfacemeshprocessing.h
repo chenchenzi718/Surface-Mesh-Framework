@@ -8,6 +8,10 @@
 class QAction;
 class MainViewerWidget;
 
+/*
+  主界面，处理信号以及槽函数等
+*/
+
 class SurfaceMeshProcessing : public QMainWindow
 {
 	Q_OBJECT

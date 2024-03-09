@@ -4,6 +4,11 @@
 #include "MeshViewerWidget.h"
 #include "../ANN/ANN.h"
 
+
+/*
+	MeshViewerWidget 给出了关于 mesh 的基础信息后，InteractiveViewerWidget 完成主要的网格变化工作
+*/
+
 class InteractiveViewerWidget : public MeshViewerWidget
 {
 	Q_OBJECT

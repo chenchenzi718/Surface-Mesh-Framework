@@ -9,6 +9,10 @@
 #include "InteractiveViewerWidget.h"
 #include "MeshParamDialog.h"
 
+/*
+	这个类统合了 InteractiveViewerWidget 类的显示以及 MeshParamDialog 类的显示
+*/
+
 class MainViewerWidget : public QDialog
 {
 	Q_OBJECT
@@ -162,6 +166,7 @@ private:
 	{
 	}
 
+	// 增加代码可读性，直接可折叠
 #pragma region Auxiliary Function
 public:
 	void aux_inverse_mesh_connectivity()

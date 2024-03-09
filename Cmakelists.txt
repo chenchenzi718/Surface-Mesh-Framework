@@ -24,9 +24,9 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 endif()
 
 #path
-SET(EIGEN_PATH "D:/LIBRARY/Eigen")
-SET(OPENMESH_PATH "D:/LIBRARY/OpenMesh/src")
-SET(OPENMESH_LIB_PATH "D:/LIBRARY/OpenMesh/build_vs/Build/lib")
+SET(EIGEN_PATH "D:/myapp/Eigen/eigen-3.4.0")
+SET(OPENMESH_PATH "D:/myapp/openmesh/OpenMesh-10.0.0/src")
+SET(OPENMESH_LIB_PATH "D:/myapp/openmesh/OpenMesh-10.0.0/install/lib")
 
 #QT
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -69,6 +69,7 @@ file (GLOB MeshViewer_FILE
     src/MeshViewer/MeshViewerWidget.*
     src/MeshViewer/OpenglHeaders.h
     src/MeshViewer/QGLViewerWidget.*
+    src/MeshViewer/MeshSimplification.*
 )
 
 add_executable(${PROJECT_NAME} ${SRCFILES} 

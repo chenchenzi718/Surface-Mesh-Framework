@@ -6,6 +6,10 @@
 
 #include <vector>
 
+/*
+	配置 qt opengl 环境，让它可以响应鼠标等操作，完成渲染更新
+*/
+
 class QGLViewerWidget : public QGLWidget 
 {
 	Q_OBJECT

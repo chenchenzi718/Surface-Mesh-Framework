@@ -8,6 +8,10 @@
 #include "QGLViewerWidget.h"
 #include "MeshDefinition.h"
 
+/*
+	主要完成 mesh 的读取，读取后的基本信息给出，mesh 的初始化，保存，更新
+*/
+
 class MeshViewerWidget : public QGLViewerWidget 
 {
 	Q_OBJECT
