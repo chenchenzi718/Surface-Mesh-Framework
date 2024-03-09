@@ -88,7 +88,8 @@ public slots:
 	}
 
 public:
-	enum { TRANS, POINTPICK, VERTEXPICK, EDGEPICK, FACEPICK, EDGECOLLAPSE, EDGEFLIP, EDGESPLIT , MOVE, T2_MODE, N_MODE };
+	enum { TRANS, POINTPICK, VERTEXPICK, EDGEPICK, FACEPICK, EDGECOLLAPSE, EDGEFLIP, 
+		EDGESPLIT , MOVE, T2_MODE, N_MODE };
 	void setMouseMode(int mm);
 	int mouseMode() const { return mouse_mode_; }
 
@@ -101,6 +102,7 @@ protected:
 	int t2_mode_;
 
 protected:
+	// 主要实现了对于面，线，点的选取并绘制的功能
 	void pick_vertex(int x,int y);
 	void pick_face(int x,int y);
 	void pick_edge(int x,int y);
@@ -120,6 +122,7 @@ protected:
 	void draw_selected_vertex();
 	void draw_selected_face();
 	void draw_selected_edge();
+	// 首先绘出上面的被选择的拓扑，然后执行了父类 draw_scene
 	virtual void draw_scene(int drawmode);
 	bool draw_new_mesh;
 

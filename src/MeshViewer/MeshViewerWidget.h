@@ -10,6 +10,9 @@
 
 /*
 	主要完成 mesh 的读取，读取后的基本信息给出，mesh 的初始化，保存，更新
+	当调用 updateGL 时会调用函数调用顺序是：
+	updateGL()（或其他重绘触发机制）→ QGLViewerWidget::paintGL() → MeshViewerWidget::draw_scene()
+	因为 paintGL 被设置为了私有类
 */
 
 class MeshViewerWidget : public QGLViewerWidget 
