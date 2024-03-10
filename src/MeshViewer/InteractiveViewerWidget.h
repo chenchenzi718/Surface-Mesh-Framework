@@ -3,11 +3,19 @@
 
 #include "MeshViewerWidget.h"
 #include "../ANN/ANN.h"
-
+#include<queue>
+#include<map>
+#include<Eigen/Dense>
+#include<Eigen/Core>
+#include<algorithm>
+#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
+#include <OpenMesh/Core/Utils/PropertyManager.hh>
+#include <set>
 
 /*
 	MeshViewerWidget 给出了关于 mesh 的基础信息后，InteractiveViewerWidget 完成主要的网格变化工作
 */
+
 
 class InteractiveViewerWidget : public MeshViewerWidget
 {
@@ -163,9 +171,30 @@ public:
 
 #pragma region HomeWork_region
 public:
+	// 设置一个结构体用来记录边的合并代价以及最优点
+	struct EdgeCollapseInfo {
+		Mesh::EdgeHandle eh;
+		double cost;
+		OpenMesh::Vec3d opt_point;
+		int count; // 有些边进去优先队列时是更新前的信息，不作数
+	};
+	// 设置比较函数
+	struct EdgeCompare {
+		bool operator()(const EdgeCollapseInfo& a, const EdgeCollapseInfo& b) {
+			// 根据MyClass对象中的value进行比较
+			// 为了创建最小堆，这里应当返回true当第一个参数大于第二个参数
+			return a.cost > b.cost;
+		}
+	};
+
+
 	// 执行 QEM 算法
 	void QEMSimplifyMesh();
 
+	// 
+	void NewQEMSimplifyMesh();
+
+	// 设置简化的等级
 	void SetSimplifyLevel(int level)
 	{
 		// 每次 level 变化，计算此时需要减少到多少点，然后进行操作
@@ -173,16 +202,58 @@ public:
 			(mesh_vertex_num >> level) >= simplify_lowest_vertex_num ? (mesh_vertex_num >> level) : simplify_lowest_vertex_num;
 	}
 
+	// 设置每个 vertices 的 Q 矩阵
+	void Cal_Q_ForVertex(Mesh::VertexHandle vertex_h);
+
+	// 计算一条边合并之后的代价，并计算出一个最优点
+	void Cal_Cost_ForEdge(Mesh::EdgeHandle eh);
+
+	// 更新新的点处 Q 值以及临近边的重新计算
+	void Update_Local_Variable(Mesh::VertexHandle vertex_h);
+
+	// 直接借鉴上面的 mousePressEvent 内的处理
+	bool EdgeCollapse(const EdgeCollapseInfo& edge_collapse_info);
+
+	void NewEdgeCollapse(const EdgeCollapseInfo& edge_collapse_info);
+
+
 protected:
-	// mesh 的 vertex 数目
-	int mesh_vertex_num;
-
-	// 简化等级
-	int simplify_level = 0;
-	// 简化后有多少点
-	int simplify_mesh_vertex;
-
+	int mesh_vertex_num;      // mesh 的 vertex 数目
+	int simplify_level = 0;   // 简化等级
+	int simplify_mesh_vertex; // 简化后有多少点
+	double penalty = 1e3;     // 设置边界边惩罚
+	double cost_min = 1.;  // 如果最小的值弹出比这还大就不执行
 	int simplify_lowest_vertex_num = 10;
+
+	std::map<Mesh::VertexHandle, Eigen::Matrix4d> Q2v;
+	std::priority_queue<EdgeCollapseInfo, std::vector<EdgeCollapseInfo>, EdgeCompare> edge_que,empty;
+	std::map<Mesh::EdgeHandle, int>each_edge_update_num_count;
+	std::set<Mesh::EdgeHandle> be_changed;
+#pragma endregion
+#pragma region other_method_region
+public:
+	struct AUX_EdgeCollapse
+	{
+		Mesh::HalfedgeHandle halfeh;
+		Mesh::Point newpt;
+		Mesh::VertexHandle vto;
+		Mesh::VertexHandle vfrom;
+
+		//判断该 edge 两边点对是否已被更新过的点对取代
+		int vto_flag = 0;
+		int vfrom_flag = 0;
+
+		Eigen::Matrix4f Q_new;
+		float cost;
+		bool operator<(const AUX_EdgeCollapse& a) const
+		{
+			return cost > a.cost;
+		}
+	};
+
+
+	void Mesh_Simplification(Mesh& mesh, float ratio);
+
 #pragma endregion
 };
 
