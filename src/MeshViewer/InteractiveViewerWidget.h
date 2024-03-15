@@ -191,8 +191,8 @@ public:
 	// 执行 QEM 算法
 	void QEMSimplifyMesh();
 
-	// 
-	void NewQEMSimplifyMesh();
+	// 自己写的 QEM 主体函数，发现要是把 mesh 的修改与 mesh 另外作为函数放出来就不会报错
+	void NewMeshSimplification();
 
 	// 设置简化的等级
 	void SetSimplifyLevel(int level)
@@ -200,6 +200,12 @@ public:
 		// 每次 level 变化，计算此时需要减少到多少点，然后进行操作
 		simplify_mesh_vertex =
 			(mesh_vertex_num >> level) >= simplify_lowest_vertex_num ? (mesh_vertex_num >> level) : simplify_lowest_vertex_num;
+	}
+
+	void Clear(std::priority_queue<EdgeCollapseInfo, std::vector<EdgeCollapseInfo>, EdgeCompare>& edge_que)
+	{
+		std::priority_queue<EdgeCollapseInfo, std::vector<EdgeCollapseInfo>, EdgeCompare> empty;
+		swap(empty, edge_que);
 	}
 
 	// 设置每个 vertices 的 Q 矩阵
@@ -214,8 +220,6 @@ public:
 	// 直接借鉴上面的 mousePressEvent 内的处理
 	bool EdgeCollapse(const EdgeCollapseInfo& edge_collapse_info);
 
-	void NewEdgeCollapse(const EdgeCollapseInfo& edge_collapse_info);
-
 
 protected:
 	int mesh_vertex_num;      // mesh 的 vertex 数目
@@ -226,9 +230,9 @@ protected:
 	int simplify_lowest_vertex_num = 10;
 
 	std::map<Mesh::VertexHandle, Eigen::Matrix4d> Q2v;
-	std::priority_queue<EdgeCollapseInfo, std::vector<EdgeCollapseInfo>, EdgeCompare> edge_que,empty;
+	std::priority_queue<EdgeCollapseInfo, std::vector<EdgeCollapseInfo>, EdgeCompare> edge_que;
 	std::map<Mesh::EdgeHandle, int>each_edge_update_num_count;
-	std::set<Mesh::EdgeHandle> be_changed;
+
 #pragma endregion
 #pragma region other_method_region
 public:

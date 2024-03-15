@@ -718,9 +718,10 @@ void InteractiveViewerWidget::Cal_Q_ForVertex(Mesh::VertexHandle vertex_h)
 		Q2v[vertex_h] = Q_temp;
 	}
 	*/
+
 	for (Mesh::ConstVertexFaceIter vf_it = mesh.cvf_iter(vertex_h); vf_it.is_valid(); ++vf_it)
 	{
-		Mesh::Normal face_normal = mesh.normal(vf_it);
+		Mesh::Normal face_normal = mesh.normal(*vf_it);
 		double d = -face_normal | pos;  // 计算点乘
 		p = { face_normal[0],face_normal[1],face_normal[2],d };
 		Q_temp += p * p.transpose();
@@ -738,16 +739,14 @@ void InteractiveViewerWidget::Cal_Cost_ForEdge(Mesh::EdgeHandle eh)
 
 
 	Eigen::Matrix4d Q_edge = Q2v[from_v] + Q2v[to_v];
-	Eigen::Matrix4d Q_cal = Q_edge;
-	Q_cal(3, 0) = 0.0, Q_cal(3, 1) = 0.0, Q_cal(3, 2) = 0.0, Q_cal(3, 3) = 1.0;
+	Eigen::Matrix4d A = Q_edge;
+	A(3, 0) = 0.0, A(3, 1) = 0.0, A(3, 2) = 0.0, A(3, 3) = 1.0;
 
-	OpenMesh::Vec3d opt_point;
-	Eigen::Vector4d cal_vec;
-	Eigen::Vector4d cal_b = { 0.0,0.0,0.0,1.0 };
+	Eigen::Vector4d b = { 0.0,0.0,0.0,1.0 };
 
-	cal_vec = Q_cal.colPivHouseholderQr().solve(cal_b);
+	Eigen::Vector4d cal_vec = A.colPivHouseholderQr().solve(b);
 
-	opt_point = { cal_vec[0], cal_vec[1], cal_vec[2] };
+	OpenMesh::Vec3d opt_point(cal_vec[0], cal_vec[1], cal_vec[2]);
 
 	info.eh = eh;
 	info.cost = cal_vec.transpose() * Q_edge * cal_vec;
@@ -797,121 +796,25 @@ bool InteractiveViewerWidget::EdgeCollapse(const EdgeCollapseInfo& edge_collapse
 		collapse_ok = true;
 		v_result = from_p;
 	}
-	
-	if (collapse_ok)
+	else
 	{
-		// 更新 mesh 数据
-		// buildIndex();
-		// mesh.update_normals();
-		Q2v[v_result] = Q_result;
-		Update_Local_Variable(v_result);
+		return collapse_ok;
 	}
+	
+
+	Q2v[v_result] = Q_result;
+	Update_Local_Variable(v_result);
+	
 
 	return collapse_ok;
 }
 
 
-void InteractiveViewerWidget::NewEdgeCollapse(const EdgeCollapseInfo& edge_collapse_info)
-{
-	// 最优点
-	auto eh = edge_collapse_info.eh;
-	auto eV = edge_collapse_info.opt_point;
-	std::vector<OpenMesh::HalfedgeHandle> involved_hes;
-
-	auto he = mesh.s_halfedge_handle(eh, 0);
-	auto v0 = mesh.from_vertex_handle(he);
-	auto v1 = mesh.to_vertex_handle(he);
-
-	// 存储此时要被改变了的边，存储在edge_que内的如果用到这些边了，那就是无效的
-	for (auto ve_it = mesh.ve_iter(v0); ve_it.is_valid(); ++ve_it)
-	{
-		be_changed.insert((*ve_it));
-	}
-	for (auto ve_it = mesh.ve_iter(v1); ve_it.is_valid(); ++ve_it)
-	{
-		be_changed.insert((*ve_it));
-	}
-
-	for (const auto& vhe : mesh.voh_range(v0)) {
-		if (vhe.to() != v1 && vhe.next().to() != v1) {
-			involved_hes.push_back(vhe.next());
-		}
-	}
-	for (const auto& vhe : mesh.voh_range(v1)) {
-		if (vhe.to() != v0 && vhe.next().to() != v0) {
-			involved_hes.push_back(vhe.next());
-		}
-	}
-	mesh.delete_vertex(v0);
-	mesh.delete_vertex(v1);
-	auto new_v = mesh.add_vertex(eV);
-	Q2v[new_v] = Q2v[v0] + Q2v[v1];
-	for (const auto& inv : involved_hes) {
-		auto f = mesh.add_face(new_v, mesh.from_vertex_handle(inv), mesh.to_vertex_handle(inv));
-	}
-	
-	// buildIndex();
-	mesh.update_normals();
-	Update_Local_Variable(new_v);
-}
-
-
-
 // 实现 QEM 简化
 void InteractiveViewerWidget::QEMSimplifyMesh()
 {
-	/*
-	SetSimplifyLevel(1);
-
-	
-	// 最开始先更新网格的各种 normal，清理中间变量
-	mesh.update_normals();
-	Q2v.clear();
-	swap(empty, edge_que);
-	each_edge_update_num_count.clear();
-
-	// 首先计算 mesh 所有点处的 Q 值放入 Q2v 内
-	for (Mesh::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it)
-	{
-		Cal_Q_ForVertex(*v_it);
-	}
-
-	// 计算每条边的 cost
-	for (Mesh::EdgeIter e_it = mesh.edges_begin(); e_it != mesh.edges_end(); ++e_it)
-	{
-		each_edge_update_num_count[*e_it] = 0;
-		Cal_Cost_ForEdge(*e_it);
-	}
-
-	int collapse_num = 0;
-	while ((mesh.n_vertices() > simplify_mesh_vertex) && collapse_num < 36)
-	{
-		// 取出最小的 cost 边
-		EdgeCollapseInfo edgeinfo = edge_que.top();
-		edge_que.pop();
-		if (edgeinfo.cost > cost_min) break;
-
-		auto eh = edgeinfo.eh;
-		// 当弹出的元素满足是最新被更新的边才有效
-		auto it = std::find(be_changed.begin(), be_changed.end(), eh);
-		if (it == be_changed.end())
-		{
-			NewEdgeCollapse(edgeinfo);
-			// std::cout << " "<< eh.idx();
-			mesh.update_normals();
-			++collapse_num;
-			
-		}
-	}
-	Q2v.clear();
-	swap(empty, edge_que);
-	each_edge_update_num_count.clear();
-
-	mesh.garbage_collection();
-	mesh.update_normals();
-	*/
-
-	Mesh_Simplification(mesh, 0.3);
+	//Mesh_Simplification(mesh, 0.3);
+	NewMeshSimplification();
 	
 	mesh_vector.push_back(mesh); mesh_vector_index += 1;
 	emit set_edit_undo_enable_viewer_signal(true);
@@ -919,12 +822,14 @@ void InteractiveViewerWidget::QEMSimplifyMesh()
 	updateGL();
 }
 
-void InteractiveViewerWidget::NewQEMSimplifyMesh()
+void InteractiveViewerWidget::NewMeshSimplification()
 {
+	mesh_vertex_num = mesh.n_vertices();
+
 	SetSimplifyLevel(1);
 
 	Q2v.clear();
-	swap(empty, edge_que);
+	Clear(edge_que);
 	each_edge_update_num_count.clear();
 
 	// 首先计算 mesh 所有点处的 Q 值放入 Q2v 内
@@ -941,29 +846,28 @@ void InteractiveViewerWidget::NewQEMSimplifyMesh()
 	}
 
 	int collapse_num = 0;
-	while ((mesh.n_vertices() > simplify_mesh_vertex) && collapse_num < 100)
+	// 进行循环
+	while (collapse_num<(mesh_vertex_num - simplify_mesh_vertex) && !edge_que.empty())
 	{
 		// 取出最小的 cost 边
 		EdgeCollapseInfo edgeinfo = edge_que.top();
 		edge_que.pop();
+
 		auto eh = edgeinfo.eh;
-		if (each_edge_update_num_count[eh] == edgeinfo.count)
-		{
-			EdgeCollapse(edgeinfo);
-			++collapse_num;
-		}
+		if (mesh.status(eh).deleted())
+			continue;
+		if (edgeinfo.count != each_edge_update_num_count[eh])
+			continue;
+
+		EdgeCollapse(edgeinfo);
+		collapse_num++;
 	}
 
 	Q2v.clear();
-	swap(empty, edge_que);
+	Clear(edge_que); // 如果不把 handle 清理干净，garbage 收集之后就报错
 	each_edge_update_num_count.clear();
 
 	mesh.garbage_collection();
-	
-	mesh_vector.push_back(mesh); mesh_vector_index += 1;
-	emit set_edit_undo_enable_viewer_signal(true);
-	emit set_edit_redo_enable_viewer_signal(false);
-	updateGL();
 }
 
 
