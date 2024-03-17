@@ -60,6 +60,7 @@ file (GLOB GUI_FILE
     src/MeshViewer/MeshParamDialog.*
     src/surfacemeshprocessing.cpp
     src/surfacemeshprocessing.h
+    src/MeshViewer/Aux_QEMWidget.*
 )
 
 file (GLOB MeshViewer_FILE
@@ -69,6 +70,7 @@ file (GLOB MeshViewer_FILE
     src/MeshViewer/MeshViewerWidget.*
     src/MeshViewer/OpenglHeaders.h
     src/MeshViewer/QGLViewerWidget.*
+    src/MeshViewer/QEMSimplification.*
 )
 
 add_executable(${PROJECT_NAME} ${SRCFILES} 

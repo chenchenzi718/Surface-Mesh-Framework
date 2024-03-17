@@ -206,6 +206,7 @@ void SurfaceMeshProcessing::createActions()
 	MeshSimplifyAction->setCheckable(true);
 	MeshSimplifyAction->setChecked(false);
 	connect(MeshSimplifyAction, SIGNAL(triggered()), this, SLOT(qem_simplify()));
+	connect(MeshSimplifyAction, SIGNAL(triggered()), viewer, SLOT(show_qem_widget()));
 
 
 	saveScreenAction = new QAction("Save Screen",this);
@@ -507,6 +508,8 @@ void SurfaceMeshProcessing::qem_simplify()
 	setAllMouseActionChecked(false);
 	MeshSimplifyAction->setChecked(true);
 	viewer->setMouseMode(InteractiveViewerWidget::SIMPLIFY);
+
+
 }
 
 // 设置鼠标 action 的激活状态

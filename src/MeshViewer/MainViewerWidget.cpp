@@ -13,6 +13,7 @@ void MainViewerWidget::initViewerWindow()
 {
 	createParamIDialog();
 	createViewerDialog();
+	qem_widget = new AUX_QEMWidget();
 
 	//this->setOrientation( Qt::Horizontal );
 
@@ -26,9 +27,12 @@ void MainViewerWidget::initViewerWindow()
 	QSplitterHandle* splitterHandle = this->handle(1);
 	splitterHandle->setDisabled(true);*/
 
+	
 	QHBoxLayout* main_layout = new QHBoxLayout();
 	main_layout->addWidget(MeshParam, 1);
 	main_layout->addWidget(MeshViewer, 5);
+	main_layout->addWidget(qem_widget, 1);
+	qem_widget->hide();
 	this->setLayout(main_layout);
 
 	// 信号从 meshviewer 传递给 mainviewwidget，然后再发送出去传给 surfacemeshprocess 内的 slot
@@ -38,6 +42,8 @@ void MainViewerWidget::initViewerWindow()
 	connect(MeshViewer,SIGNAL(set_edit_redo_enable_viewer_signal(bool)),SIGNAL(set_edit_redo_enable_signal(bool)));
 
 	connect(MeshParam, SIGNAL(print_info_signal()), SLOT(print_info()));
+	connect(qem_widget, &AUX_QEMWidget::qem_slider_value_changed_signal,
+		MeshViewer, &InteractiveViewerWidget::QEM_Simplification_Ratio_Changed);
 }
 
 void MainViewerWidget::createParamIDialog()
@@ -104,3 +110,5 @@ void MainViewerWidget::print_info()
 {
 	MeshViewer->printBasicMeshInfo();
 }
+
+

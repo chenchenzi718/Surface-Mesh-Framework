@@ -8,6 +8,7 @@
 //main widget
 #include "InteractiveViewerWidget.h"
 #include "MeshParamDialog.h"
+#include"Aux_QEMWidget.h"
 
 /*
 	这个类统合了 InteractiveViewerWidget 类的显示以及 MeshParamDialog 类的显示
@@ -139,6 +140,12 @@ public slots:
 	//
 	void print_info();
 
+	void show_qem_widget()
+	{
+		qem_widget->show();
+	}
+	
+
 signals:
 	void haveLoadMesh(QString filePath);
 	void setMouseMode_signal_main(int);
@@ -161,6 +168,8 @@ protected:
 private:
 	InteractiveViewerWidget* MeshViewer;
 	MeshParamDialog* MeshParam;
+
+	AUX_QEMWidget* qem_widget;
 
 
 	
