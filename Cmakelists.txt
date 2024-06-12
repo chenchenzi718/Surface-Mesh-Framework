@@ -4,6 +4,9 @@ project(SurfaceFramework)
 #设置不生成MinSizeRel;RelWithDebInfo
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
+# 添加 /bigobj 编译选项
+add_compile_options(/bigobj)
+
 add_definitions(/D_USE_MATH_DEFINES)
 
 #Complier
@@ -25,6 +28,7 @@ endif()
 
 #path
 SET(EIGEN_PATH "D:/myapp/Eigen/eigen-3.4.0")
+SET(IGL_PATH "D:/myapp/libigl/libigl/include")
 SET(OPENMESH_PATH "D:/myapp/openmesh/OpenMesh-10.0.0/src")
 SET(OPENMESH_LIB_PATH "D:/myapp/openmesh/OpenMesh-10.0.0/install/lib")
 
@@ -46,6 +50,7 @@ set(QRC_SOURCE_FILES src/surfacemeshprocessing.qrc)
 qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
 
 include_directories(${EIGEN_PATH})
+include_directories(${IGL_PATH})
 include_directories(${OPENMESH_PATH})
 link_directories(${OPENMESH_LIB_PATH})
 
@@ -71,6 +76,7 @@ file (GLOB MeshViewer_FILE
     src/MeshViewer/OpenglHeaders.h
     src/MeshViewer/QGLViewerWidget.*
     src/MeshViewer/QEMSimplification.*
+    src/MeshViewer/SpectralQEM.*
 )
 
 add_executable(${PROJECT_NAME} ${SRCFILES} 

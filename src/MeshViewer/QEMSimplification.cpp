@@ -29,6 +29,7 @@ void QEMSimplification::Cal_Q_ForVertex(const Mesh& mesh, Mesh::VertexHandle ver
 	Eigen::Vector4d p;   // 用来记录文章内的 plane
 	p.setZero();
 
+
 	/*
 	// 如果这个点不是边界点
 	if (!mesh.is_boundary(vertex_h))

@@ -8,8 +8,6 @@
 #include<Eigen/Core>
 #include<algorithm>
 
-#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-#include <OpenMesh/Core/Utils/PropertyManager.hh>
 
 class QEMSimplification {
 public:

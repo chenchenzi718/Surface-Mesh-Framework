@@ -5,6 +5,7 @@
 #include "../ANN/ANN.h"
 
 #include"QEMSimplification.h"
+#include"SpectralQEM.h"
 
 /*
 	MeshViewerWidget 给出了关于 mesh 的基础信息后，InteractiveViewerWidget 完成主要的网格变化工作
@@ -174,6 +175,13 @@ public slots:
 
 #pragma endregion
 
+
+#pragma region hw_cubic_stylization
+public:
+	SpectralQEM sp_qem;
+
+	void SpectralQEMSimplifyMesh();
+#pragma endregion
 };
 
 #endif
