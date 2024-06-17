@@ -40,8 +40,8 @@ void InteractiveViewerWidget::setMouseMode(int mm)
 		// 如果 mousemode 变成了 SIMPLIFY，那么就进行一波网格简化操作
 		if(SIMPLIFY == mouse_mode_)
 		{
-			// this->QEMSimplifyMesh();
-			this->CubicStylization();
+			this->QEMSimplifyMesh();
+			// this->SpectralQEMSimplifyMesh();
 		}
 
 		emit setMouseMode_signal(mm);
@@ -653,7 +653,7 @@ void InteractiveViewerWidget::QEM_Simplification_Ratio_Changed(int value)
 
 void InteractiveViewerWidget::SpectralQEMSimplifyMesh()
 {
-	sp_qem.ARAP_kernel(mesh);
+	sp_qem.SpectralQEMKernel(mesh);
 
 	mesh_vector.push_back(mesh); mesh_vector_index += 1;
 	emit set_edit_undo_enable_viewer_signal(true);
